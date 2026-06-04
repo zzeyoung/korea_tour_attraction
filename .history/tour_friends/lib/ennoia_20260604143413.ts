@@ -37,7 +37,6 @@ export async function sendToEnnoia(
     headers: {
       project,
       apiKey,
-      'X-ENNOIA-USER-ID': 'tour-friends-mvp',  // ⭐ 추가
       'Content-Type': 'application/json; charset=utf-8',
     },
     body: JSON.stringify(body),
