@@ -12,8 +12,8 @@
     "latitude": 37.579617,
     "longitude": 126.977041,
     "friends": [
-      { "placeId": "264352", "relation": "가장 친한 친구" },
-      { "placeId": "127454", "relation": "가까운 이웃" },
+      { "placeId": "127454", "relation": "가장 친한 친구" },
+      { "placeId": "264341", "relation": "가까운 이웃" },
       { "placeId": "264338", "relation": "선의의 라이벌" }
     ]
   },
