@@ -11,7 +11,6 @@ import {
 } from '@/lib/storage';
 import charactersData from '@/data/characters.json';
 import FriendRecommendCard from '@/components/FriendRecommendCard';
-import VisitButton from '@/components/VisitButton';
 
 const characters = charactersData as CharactersData;
 
@@ -128,14 +127,13 @@ export default function ChatPage() {
         </Link>
         <div className="text-3xl">{character.emoji}</div>
         <div className="flex-1 min-w-0">
-          <div className="font-bold text-stone-900 leading-tight truncate">
+          <div className="font-bold text-stone-900 leading-tight">
             {character.name}
           </div>
           <div className="text-[11px] text-stone-500 truncate">
             {character.region} · {character.mbti} · {character.age}
           </div>
         </div>
-        <VisitButton character={character} />
       </header>
 
       {/* Messages */}
