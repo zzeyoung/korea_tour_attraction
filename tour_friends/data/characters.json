@@ -33,5 +33,56 @@
       { "placeId": "126508", "relation": "친한 형" },
       { "placeId": "264352", "relation": "속마음 친구" }
     ]
-  }
+  },
+  "126509": {
+  "placeId": "126509",
+  "name": "덕수궁",
+  "shortName": "덕수궁",
+  "region": "서울 중구",
+  "emoji": "🍂",
+  "thumbnail": "/characters/deoksugung.png",
+  "mbti": "ISFP",
+  "age": "433살",
+  "tagline": "대한제국의 마지막 정궁. 동서양이 만나고, 슬픔이 머무는 곳.",
+  "latitude": 37.565794,
+  "longitude": 126.975143,
+  "friends": [
+    { "placeId": "126508", "relation": "선의의 라이벌" },
+    { "placeId": "127454", "relation": "추억을 함께 나누는 사이" }
+  ]
+  },
+  "129176": {
+  "placeId": "129176",
+  "name": "묵호등대",
+  "shortName": "묵호등대",
+  "region": "강원 동해시",
+  "emoji": "🏮",
+  "thumbnail": "/characters/mukho.png",
+  "mbti": "ISTP",
+  "age": "63살",
+  "tagline": "묵호항을 60년째 지켜온 등대. 짠내 나는 바닷가 어르신.",
+  "latitude": 37.547076,
+  "longitude": 129.116631,
+  "friends": [
+    { "placeId": "2557057", "relation": "가까운 동해 바다 친구" },
+    { "placeId": "1888644", "relation": "멀리 사는 같은 바다 친구" }
+  ]
+  },
+  "125702": {
+  "placeId": "125702",
+  "name": "양양 낙산해수욕장",
+  "shortName": "낙산해수욕장",
+  "region": "강원 양양군",
+  "emoji": "🏄",
+  "thumbnail": "/characters/yangyang.png",
+  "mbti": "ESFP",
+  "age": "50살",
+  "tagline": "한국 서핑 성지. MZ가 사랑하는 동해 바다의 핫플.",
+  "latitude": 38.116200,
+  "longitude": 128.635200,
+  "friends": [
+    { "placeId": "129176", "relation": "옆 동네 바다 어르신" },
+    { "placeId": "2557057", "relation": "같은 동해 친구" }
+  ]
+}
 }
