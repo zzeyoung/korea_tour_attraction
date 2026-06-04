@@ -1,0 +1,66 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import characters from '@/data/characters.json';
+import { getChatHistory, saveChatHistory, updateCollectionStatus } from '@/lib/storage';
+
+export default function ChatPage() {
+  const { placeId } = useParams<{ placeId: string }>();
+  const character = characters[placeId];
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    const history = getChatHistory(placeId);
+    setMessages(history);
+    // 첫 진입이면 도감 'discovered'로 업그레이드
+    if (history.length === 0) {
+      updateCollectionStatus(placeId, { 
+        level: 'discovered', 
+        firstChatAt: Date.now() 
+      });
+    }
+  }, [placeId]);
+  
+  const sendMessage = async () => {
+    if (!input.trim()) return;
+    
+    const userMsg: ChatMessage = { role: 'user', content: input, timestamp: Date.now() };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput('');
+    setLoading(true);
+    
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ placeId, messages: newMessages }),
+    });
+    const { reply } = await res.json();
+    
+    const aiMsg: ChatMessage = { role: 'assistant', content: reply, timestamp: Date.now() };
+    const finalMessages = [...newMessages, aiMsg];
+    setMessages(finalMessages);
+    saveChatHistory(placeId, finalMessages);
+    setLoading(false);
+  };
+  
+  return (
+    <div className="flex flex-col h-screen">
+      <ChatHeader character={character} />
+      <div className="flex-1 overflow-y-auto p-4">
+        {messages.map((m, i) => <ChatBubble key={i} message={m} />)}
+        {loading && <div>입력 중...</div>}
+      </div>
+      <div className="border-t p-3 flex gap-2">
+        <input 
+          value={input} 
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && sendMessage()}
+          className="flex-1 border rounded-full px-4 py-2"
+        />
+        <button onClick={sendMessage} className="bg-black text-white rounded-full px-6">전송</button>
+      </div>
+    </div>
+  );
+}
