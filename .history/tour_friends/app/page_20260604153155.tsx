@@ -6,7 +6,6 @@ import charactersData from '@/data/characters.json';
 import type { CharactersData, CollectionStatus } from '@/lib/types';
 import { getAllCollectionStatuses } from '@/lib/storage';
 import CollectionCard from '@/components/CollectionCard';
-import BottomNav from '@/components/BottomNav';
 
 const characters = charactersData as CharactersData;
 
@@ -17,13 +16,15 @@ export default function CollectionPage() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setStatuses(getAllCollectionStatuses(Object.keys(characters)));
+    const list = Object.keys(characters);
+    setStatuses(getAllCollectionStatuses(list));
     setHydrated(true);
   }, []);
 
   const allCharacters = Object.values(characters);
   const total = allCharacters.length;
 
+  // 진행도 계산
   const discoveredCount = hydrated
     ? allCharacters.filter(
         (c) =>
@@ -40,13 +41,13 @@ export default function CollectionPage() {
   const progress = total > 0 ? (visitedCount / total) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-20">
+    <div className="min-h-screen bg-stone-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-stone-200/80 px-4 py-3 flex items-center gap-3 sticky top-0 z-10">
         <Link
           href="/"
           className="text-stone-500 hover:text-stone-900 hover:bg-stone-100 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
-          aria-label="홈으로"
+          aria-label="뒤로"
         >
           ←
         </Link>
@@ -78,6 +79,7 @@ export default function CollectionPage() {
               발견 {hydrated ? discoveredCount : 0}
             </span>
           </div>
+          {/* Progress bar */}
           <div className="w-full h-1.5 bg-stone-700/50 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-rose-400 to-amber-300 rounded-full transition-all duration-700"
@@ -129,8 +131,6 @@ export default function CollectionPage() {
           </ul>
         </div>
       </div>
-
-      <BottomNav />
     </div>
   );
 }
