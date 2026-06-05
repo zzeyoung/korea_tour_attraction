@@ -120,7 +120,7 @@ export default function ChatPage() {
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-stone-200/80 px-4 py-3 flex items-center gap-3 shrink-0 z-10">
         <Link
-          href="/places"
+          href="/"
           className="text-stone-500 hover:text-stone-900 hover:bg-stone-100 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
           aria-label="뒤로"
         >
