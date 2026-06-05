@@ -39,3 +39,12 @@ export interface CollectionStatus {
   firstChatAt?: number;
   visitedAt?: number;
 }
+
+// 방명록 (비공개, localStorage)
+export interface GuestbookEntry {
+  id: string;
+  placeId: string;
+  content: string;
+  photoBase64?: string;
+  createdAt: number;
+}

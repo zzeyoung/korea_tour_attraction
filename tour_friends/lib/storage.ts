@@ -73,3 +73,56 @@ export function getAllCollectionStatuses(placeIds: string[]): Record<string, Col
   }
   return result;
 }
+
+
+import type { GuestbookEntry } from './types';
+
+// ============ 방명록 ============
+
+export function getGuestbookEntries(placeId: string): GuestbookEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const data = localStorage.getItem(`guestbook_${placeId}`);
+    const arr: GuestbookEntry[] = data ? JSON.parse(data) : [];
+    return arr.sort((a, b) => b.createdAt - a.createdAt);
+  } catch {
+    return [];
+  }
+}
+
+export function addGuestbookEntry(
+  placeId: string,
+  entry: Omit<GuestbookEntry, 'id' | 'placeId' | 'createdAt'>
+): GuestbookEntry {
+  const newEntry: GuestbookEntry = {
+    ...entry,
+    id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    placeId,
+    createdAt: Date.now(),
+  };
+  const existing = getGuestbookEntries(placeId);
+  const updated = [newEntry, ...existing];
+  try {
+    localStorage.setItem(`guestbook_${placeId}`, JSON.stringify(updated));
+  } catch (e) {
+    console.error('[guestbook] save failed (quota?):', e);
+    throw new Error('저장 공간이 부족합니다. 사진을 줄여보세요.');
+  }
+  return newEntry;
+}
+
+export function deleteGuestbookEntry(placeId: string, entryId: string) {
+  const existing = getGuestbookEntries(placeId);
+  const updated = existing.filter((e) => e.id !== entryId);
+  localStorage.setItem(`guestbook_${placeId}`, JSON.stringify(updated));
+}
+
+export function getGuestbookCount(placeId: string): number {
+  if (typeof window === 'undefined') return 0;
+  try {
+    const data = localStorage.getItem(`guestbook_${placeId}`);
+    return data ? (JSON.parse(data) as GuestbookEntry[]).length : 0;
+  } catch {
+    return 0;
+  }
+}

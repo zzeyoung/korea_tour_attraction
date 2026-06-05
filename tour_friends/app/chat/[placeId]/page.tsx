@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import GuestbookModal from '@/components/GuestbookModal';
+import { getCollectionStatus } from '@/lib/storage';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import type { ChatMessage, CharactersData } from '@/lib/types';
@@ -44,11 +46,16 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [guestbookOpen, setGuestbookOpen] = useState(false);
+  const [guestbookMode, setGuestbookMode] = useState<'list' | 'write'>('list');
+  const [isVisited, setIsVisited] = useState(false);
 
   useEffect(() => {
-    setMessages(getChatHistory(placeId));
-    setHydrated(true);
-  }, [placeId]);
+  setMessages(getChatHistory(placeId));
+  const status = getCollectionStatus(placeId);
+  setIsVisited(status.level === 'visited');
+  setHydrated(true);
+}, [placeId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -56,6 +63,7 @@ export default function ChatPage() {
       behavior: 'smooth',
     });
   }, [messages, loading]);
+  
 
   async function handleSend() {
     if (!input.trim() || loading) return;
@@ -135,7 +143,30 @@ export default function ChatPage() {
             {character.region} · {character.mbti} · {character.age}
           </div>
         </div>
-        <VisitButton character={character} />
+        <div className="flex items-center gap-1.5">
+          {/* 방명록 버튼 - 방문 인증한 경우만 활성화 */}
+          <button
+            onClick={() => {
+              setGuestbookMode('list');
+              setGuestbookOpen(true);
+            }}
+            disabled={!isVisited}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed enabled:hover:bg-stone-100 text-stone-700"
+            title={isVisited ? '방명록 보기' : '방문 인증 후 방명록을 쓸 수 있어요'}
+          >
+            <span>📓</span>
+            <span className="hidden sm:inline">방명록</span>
+          </button>
+
+          <VisitButton
+            character={character}
+            onVisited={() => {
+              setIsVisited(true);
+              setGuestbookMode('write');
+              setGuestbookOpen(true);
+            }}
+          />
+        </div>
       </header>
 
       {/* Messages */}
@@ -246,6 +277,14 @@ export default function ChatPage() {
           </button>
         </div>
       </div>
+
+      {/* 방명록 모달 */}
+      <GuestbookModal
+        character={character}
+        open={guestbookOpen}
+        initialMode={guestbookMode}
+        onClose={() => setGuestbookOpen(false)}
+      />
     </div>
   );
 }
