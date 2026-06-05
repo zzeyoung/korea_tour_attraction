@@ -231,13 +231,6 @@ export default function CollectionPage() {
         </div>
       </div>
 
-      <ShareModal
-        open={shareOpen}
-        onClose={() => setShareOpen(false)}
-        characters={allCharacters}
-        statuses={statuses}
-      />
-
       <BottomNav />
     </div>
   );
