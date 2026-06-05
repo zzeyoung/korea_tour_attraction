@@ -30,6 +30,7 @@ export default function CollectionCard({ character, status }: Props) {
       </div>
     );
   }
+
   // 💬 DISCOVERED
   if (status.level === 'discovered') {
     return (

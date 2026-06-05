@@ -61,7 +61,16 @@ export default function CollectionPage() {
     [allCharacters, selectedProvince, selectedCity]
   );
 
-  
+  // 칩별 visited 카운트
+  const provinceVisited = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of allCharacters) {
+      if (statuses[c.placeId]?.level !== 'visited') continue;
+      const p = parseRegion(c.region).province;
+      counts[p] = (counts[p] ?? 0) + 1;
+    }
+    return counts;
+  }, [allCharacters, statuses]);
 
   return (
     <div className="min-h-screen bg-stone-50 pb-20 md:pb-0">

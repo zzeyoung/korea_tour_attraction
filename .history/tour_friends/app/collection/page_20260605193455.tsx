@@ -61,7 +61,16 @@ export default function CollectionPage() {
     [allCharacters, selectedProvince, selectedCity]
   );
 
-  
+  // 칩별 visited 카운트
+  const provinceVisited = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of allCharacters) {
+      if (statuses[c.placeId]?.level !== 'visited') continue;
+      const p = parseRegion(c.region).province;
+      counts[p] = (counts[p] ?? 0) + 1;
+    }
+    return counts;
+  }, [allCharacters, statuses]);
 
   return (
     <div className="min-h-screen bg-stone-50 pb-20 md:pb-0">
@@ -104,7 +113,7 @@ export default function CollectionPage() {
           </div>
         </div>
 
-       {/* 시/도 칩 필터 */}
+        {/* 시/도 칩 필터 */}
         <div className="mb-4 flex flex-wrap gap-2">
           <button
             onClick={() => {
@@ -117,24 +126,33 @@ export default function CollectionPage() {
                 : 'bg-white border border-stone-200 text-stone-700 hover:border-stone-300'
             }`}
           >
-            전체
+            전체 <span className="opacity-60 ml-0.5">{total}</span>
           </button>
-          {provinces.map((p) => (
-            <button
-              key={p}
-              onClick={() => {
-                setSelectedProvince(p);
-                setSelectedCity(null);
-              }}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95 ${
-                selectedProvince === p
-                  ? 'bg-stone-900 text-white shadow-sm'
-                  : 'bg-white border border-stone-200 text-stone-700 hover:border-stone-300'
-              }`}
-            >
-              {p}
-            </button>
-          ))}
+          {provinces.map((p) => {
+            const count = allCharacters.filter(
+              (c) => parseRegion(c.region).province === p
+            ).length;
+            const visited = provinceVisited[p] ?? 0;
+            return (
+              <button
+                key={p}
+                onClick={() => {
+                  setSelectedProvince(p);
+                  setSelectedCity(null);
+                }}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95 ${
+                  selectedProvince === p
+                    ? 'bg-stone-900 text-white shadow-sm'
+                    : 'bg-white border border-stone-200 text-stone-700 hover:border-stone-300'
+                }`}
+              >
+                {p}
+                <span className="opacity-60 ml-1">
+                  {visited > 0 ? `${visited}/${count}` : count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* 시/군/구 칩 (시/도 선택 시) */}

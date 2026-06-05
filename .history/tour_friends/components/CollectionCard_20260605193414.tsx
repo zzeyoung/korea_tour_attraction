@@ -20,16 +20,35 @@ export default function CollectionCard({ character, status }: Props) {
   const cardBase =
     'relative aspect-[3/4] rounded-2xl overflow-hidden transition-all';
 
-  // 🔒 LOCKED — 단순한 ? 카드
+  // 🔒 LOCKED
   if (status.level === 'locked') {
     return (
       <div
-        className={`${cardBase} bg-stone-100 border border-stone-200 flex items-center justify-center`}
+        className={`${cardBase} bg-stone-100 border border-stone-200`}
       >
-        <div className="text-4xl text-stone-300 font-light">?</div>
+        {/* 카드 이미지 (강한 블러) */}
+        <div className="absolute inset-0 blur-2xl opacity-30 grayscale">
+          <Image
+            src={character.thumbnail}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 50vw, 20vw"
+            className="object-cover"
+          />
+        </div>
+        {/* 어두운 베일 */}
+        <div className="absolute inset-0 bg-stone-200/60" />
+        {/* 자물쇠 */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="text-3xl mb-1.5 opacity-40">🔒</div>
+          <div className="text-[10px] font-bold text-stone-400 tracking-[0.2em]">
+            LOCKED
+          </div>
+        </div>
       </div>
     );
   }
+
   // 💬 DISCOVERED
   if (status.level === 'discovered') {
     return (

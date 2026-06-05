@@ -9,35 +9,41 @@ interface Props {
   status: CollectionStatus;
 }
 
-function formatDate(ts?: number) {
-  if (!ts) return '';
-  const d = new Date(ts);
-  return `${d.getMonth() + 1}.${d.getDate()}`;
-}
-
 export default function CollectionCard({ character, status }: Props) {
-  // 공통: 카드 컨테이너
   const cardBase =
     'relative aspect-[3/4] rounded-2xl overflow-hidden transition-all';
 
-  // 🔒 LOCKED — 단순한 ? 카드
+  // 🔒 LOCKED — 강한 블러 + 자물쇠
   if (status.level === 'locked') {
     return (
-      <div
-        className={`${cardBase} bg-stone-100 border border-stone-200 flex items-center justify-center`}
-      >
-        <div className="text-4xl text-stone-300 font-light">?</div>
+      <div className={`${cardBase} bg-stone-100 border border-stone-200`}>
+        <div className="absolute inset-0 blur-2xl opacity-30 grayscale">
+          <Image
+            src={character.thumbnail}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 50vw, 20vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="absolute inset-0 bg-stone-200/60" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="text-3xl mb-1.5 opacity-40">🔒</div>
+          <div className="text-[10px] font-bold text-stone-400 tracking-[0.2em]">
+            LOCKED
+          </div>
+        </div>
       </div>
     );
   }
-  // 💬 DISCOVERED
+
+  // 💬 DISCOVERED — 흑백
   if (status.level === 'discovered') {
     return (
       <Link
         href={`/chat/${character.placeId}`}
         className={`group block ${cardBase} bg-white border border-stone-200 hover:shadow-md hover:border-stone-300 active:scale-[0.98]`}
       >
-        {/* 카드 이미지 (흑백) */}
         <div className="absolute inset-0 grayscale opacity-90 group-hover:opacity-100 transition-opacity">
           <Image
             src={character.thumbnail}
@@ -47,23 +53,17 @@ export default function CollectionCard({ character, status }: Props) {
             className="object-cover"
           />
         </div>
-        {/* 옅은 베일 */}
         <div className="absolute inset-0 bg-white/15" />
-        {/* 상단 좌 — 발견 뱃지 */}
-        <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-bold text-stone-600 shadow-sm">
-          💬 발견
-        </div>
       </Link>
     );
   }
 
-  // ✓ VISITED
+  // ✓ VISITED — 풀컬러, 미니멀 (체크 뱃지 X)
   return (
     <Link
       href={`/chat/${character.placeId}`}
-      className={`group block ${cardBase} bg-white border-2 border-emerald-300 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1 shadow-md`}
+      className={`group block ${cardBase} bg-white border border-stone-200 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1 shadow-sm`}
     >
-      {/* 카드 이미지 (풀컬러) */}
       <div className="absolute inset-0">
         <Image
           src={character.thumbnail}
@@ -74,15 +74,6 @@ export default function CollectionCard({ character, status }: Props) {
           priority
         />
       </div>
-      
-      {/* 하단 — 방문 날짜 (그라데이션) */}
-      {status.visitedAt && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent pt-6 pb-2 px-3">
-          <div className="text-[10px] font-bold text-white tracking-wide drop-shadow">
-            {formatDate(status.visitedAt)} 방문
-          </div>
-        </div>
-      )}
     </Link>
   );
 }
