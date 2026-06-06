@@ -57,13 +57,16 @@ export default function CollectionPage() {
     [allCharacters, selectedProvince, selectedCity]
   );
 
+  // 방문한 곳만 지도에 표시
   const mapCharacters = useMemo(
-    () => allCharacters.map(c => ({
-      name: c.name,
-      latitude: c.latitude,
-      longitude: c.longitude,
-      level: (statuses[c.placeId]?.level ?? 'locked') as 'locked' | 'discovered' | 'visited',
-    })),
+    () => allCharacters
+      .filter(c => statuses[c.placeId]?.level === 'visited')
+      .map(c => ({
+        name: c.name,
+        latitude: c.latitude,
+        longitude: c.longitude,
+        level: 'visited' as const,
+      })),
     [allCharacters, statuses]
   );
 
@@ -120,9 +123,6 @@ export default function CollectionPage() {
               <div className="flex gap-4 mt-2">
                 <div className="flex items-center gap-1.5 text-xs text-stone-400">
                   <span className="w-2 h-2 rounded-full bg-rose-400 inline-block"></span>방문
-                </div>
-                <div className="flex items-center gap-1.5 text-xs text-stone-400">
-                  <span className="w-2 h-2 rounded-full bg-violet-400 inline-block"></span>발견
                 </div>
               </div>
             </div>
