@@ -1,0 +1,54 @@
+{
+  "126508": {
+    "placeId": "126508",
+    "name": "경복궁",
+    "shortName": "경복궁",
+    "region": "서울 종로구",
+    "emoji": "🏯",
+    "thumbnail": "/characters/gyeongbokgung.png",
+    "mbti": "INFJ",
+    "age": "630살",
+    "tagline": "조선의 첫 정궁. 새벽에 만나면 진짜 모습을 보여주는 차분한 어른.",
+    "latitude": 37.579617,
+    "longitude": 126.977041,
+    "friends": [
+      { "placeId": "127451", "relation": "가장 친한 친구" },
+      { "placeId": "127454", "relation": "가까운 이웃" },
+      { "placeId": "264338", "relation": "선의의 라이벌" }
+    ]
+  },
+  "127454": {
+    "placeId": "127454",
+    "name": "운현궁",
+    "shortName": "운현궁",
+    "region": "서울 종로구",
+    "emoji": "🏠",
+    "thumbnail": "/characters/unhyeongung.png",
+    "mbti": "INFP",
+    "age": "160살",
+    "tagline": "경복궁 옆에서 조용히 살아가는 내성적인 작은 궁.",
+    "latitude": 37.576438,
+    "longitude": 126.987759,
+    "friends": [
+      { "placeId": "126508", "relation": "친한 형" },
+      { "placeId": "264352", "relation": "속마음 친구" }
+    ]
+  },
+  "126509": {
+  "placeId": "126509",
+  "name": "덕수궁",
+  "shortName": "덕수궁",
+  "region": "서울 중구",
+  "emoji": "🍂",
+  "thumbnail": "/characters/deoksugung.png",
+  "mbti": "ISFP",
+  "age": "433살",
+  "tagline": "대한제국의 마지막 정궁. 동서양이 만나고, 슬픔이 머무는 곳.",
+  "latitude": 37.565794,
+  "longitude": 126.975143,
+  "friends": [
+    { "placeId": "126508", "relation": "선의의 라이벌" },
+    { "placeId": "264341", "relation": "추억을 함께 나누는 사이" }
+  ]
+  }
+}

@@ -8,7 +8,6 @@ import CollectionCard from '@/components/CollectionCard';
 import TopNav from '@/components/TopNav';
 import BottomNav from '@/components/BottomNav';
 import ShareModal from '@/components/ShareModal';
-import KakaoMap from '@/components/KakaoMap';
 import {
   getAllProvinces,
   getCitiesByProvince,
@@ -19,7 +18,9 @@ import {
 const characters = charactersData as CharactersData;
 
 export default function CollectionPage() {
-  const [statuses, setStatuses] = useState<Record<string, CollectionStatus>>({});
+  const [statuses, setStatuses] = useState<Record<string, CollectionStatus>>(
+    {}
+  );
   const [hydrated, setHydrated] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
@@ -42,14 +43,19 @@ export default function CollectionPage() {
     : 0;
 
   const visitedCount = hydrated
-    ? allCharacters.filter((c) => statuses[c.placeId]?.level === 'visited').length
+    ? allCharacters.filter((c) => statuses[c.placeId]?.level === 'visited')
+        .length
     : 0;
 
   const progress = total > 0 ? (visitedCount / total) * 100 : 0;
 
+  // 필터링
   const provinces = useMemo(() => getAllProvinces(allCharacters), [allCharacters]);
   const cities = useMemo(
-    () => selectedProvince ? getCitiesByProvince(allCharacters, selectedProvince) : [],
+    () =>
+      selectedProvince
+        ? getCitiesByProvince(allCharacters, selectedProvince)
+        : [],
     [allCharacters, selectedProvince]
   );
   const filtered = useMemo(
@@ -57,15 +63,7 @@ export default function CollectionPage() {
     [allCharacters, selectedProvince, selectedCity]
   );
 
-  const mapCharacters = useMemo(
-    () => allCharacters.map(c => ({
-      name: c.name,
-      latitude: c.latitude,
-      longitude: c.longitude,
-      level: (statuses[c.placeId]?.level ?? 'locked') as 'locked' | 'discovered' | 'visited',
-    })),
-    [allCharacters, statuses]
-  );
+  
 
   return (
     <div className="min-h-screen bg-stone-50 pb-20 md:pb-0">
@@ -77,7 +75,9 @@ export default function CollectionPage() {
             <h1 className="text-3xl md:text-4xl font-bold text-stone-900 tracking-tight">
               도감
             </h1>
-            <p className="text-stone-500 mt-2">한국의 장소들을 만나고 모아보세요</p>
+            <p className="text-stone-500 mt-2">
+              한국의 장소들을 만나고 모아보세요
+            </p>
           </div>
           <button
             onClick={() => setShareOpen(true)}
@@ -91,7 +91,9 @@ export default function CollectionPage() {
         {/* 진행도 카드 */}
         <div className="bg-gradient-to-br from-stone-900 to-stone-700 text-white rounded-2xl p-6 md:p-8 mb-8 shadow-lg">
           <div className="flex items-baseline justify-between mb-3">
-            <div className="text-sm font-medium text-stone-300">나의 발자국</div>
+            <div className="text-sm font-medium text-stone-300">
+              나의 발자국
+            </div>
             <div className="text-xs text-stone-400">
               {hydrated ? `${visitedCount} / ${total} 방문` : '...'}
             </div>
@@ -105,34 +107,21 @@ export default function CollectionPage() {
               발견 {hydrated ? discoveredCount : 0}
             </span>
           </div>
-          <div className="w-full h-1.5 bg-stone-700/50 rounded-full overflow-hidden mb-4">
+          <div className="w-full h-1.5 bg-stone-700/50 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-rose-400 to-amber-300 rounded-full transition-all duration-700"
               style={{ width: `${progress}%` }}
             />
           </div>
-
-          {/* 카카오 지도 */}
-          {hydrated && (
-            <div className="mt-2">
-              <div className="text-xs text-stone-400 mb-2">📍 내가 다녀온 곳</div>
-              <KakaoMap characters={mapCharacters} />
-              <div className="flex gap-4 mt-2">
-                <div className="flex items-center gap-1.5 text-xs text-stone-400">
-                  <span className="w-2 h-2 rounded-full bg-rose-400 inline-block"></span>방문
-                </div>
-                <div className="flex items-center gap-1.5 text-xs text-stone-400">
-                  <span className="w-2 h-2 rounded-full bg-violet-400 inline-block"></span>발견
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* 시/도 칩 필터 */}
+       {/* 시/도 칩 필터 */}
         <div className="mb-4 flex flex-wrap gap-2">
           <button
-            onClick={() => { setSelectedProvince(null); setSelectedCity(null); }}
+            onClick={() => {
+              setSelectedProvince(null);
+              setSelectedCity(null);
+            }}
             className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95 ${
               !selectedProvince
                 ? 'bg-stone-900 text-white shadow-sm'
@@ -144,7 +133,10 @@ export default function CollectionPage() {
           {provinces.map((p) => (
             <button
               key={p}
-              onClick={() => { setSelectedProvince(p); setSelectedCity(null); }}
+              onClick={() => {
+                setSelectedProvince(p);
+                setSelectedCity(null);
+              }}
               className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95 ${
                 selectedProvince === p
                   ? 'bg-stone-900 text-white shadow-sm'
@@ -156,7 +148,7 @@ export default function CollectionPage() {
           ))}
         </div>
 
-        {/* 시/군/구 칩 */}
+        {/* 시/군/구 칩 (시/도 선택 시) */}
         {selectedProvince && cities.length > 0 && (
           <div className="mb-6 pl-3 border-l-2 border-rose-200 flex flex-wrap gap-1.5">
             <button
@@ -191,31 +183,49 @@ export default function CollectionPage() {
             <CollectionCard
               key={c.placeId}
               character={c}
-              status={statuses[c.placeId] ?? { placeId: c.placeId, level: 'locked' }}
+              status={
+                statuses[c.placeId] ?? {
+                  placeId: c.placeId,
+                  level: 'locked',
+                }
+              }
             />
           ))}
         </div>
 
+        {/* 빈 상태 */}
         {filtered.length === 0 && (
           <div className="text-center py-16 bg-white border border-stone-200 rounded-2xl">
-            <div className="text-stone-400 text-sm">이 지역에는 아직 카드가 없어요</div>
+            <div className="text-stone-400 text-sm">
+              이 지역에는 아직 카드가 없어요
+            </div>
           </div>
         )}
 
+        {/* 안내 */}
         <div className="mt-12 p-5 bg-white border border-stone-200 rounded-2xl max-w-2xl">
-          <div className="text-xs font-bold text-stone-700 mb-3 tracking-wide">도감 단계</div>
+          <div className="text-xs font-bold text-stone-700 mb-3 tracking-wide">
+            도감 단계
+          </div>
           <ul className="space-y-2 text-xs text-stone-600">
             <li className="flex items-center gap-2">
               <span>❓</span>
-              <span className="text-stone-500"><b className="text-stone-700">미발견</b> · 아직 만나지 않은 장소</span>
+              <span className="text-stone-500">
+                <b className="text-stone-700">미발견</b> · 아직 만나지 않은 장소
+              </span>
             </li>
             <li className="flex items-center gap-2">
               <span>🖤</span>
-              <span className="text-stone-500"><b className="text-stone-700">발견</b> · 대화를 나눈 장소 (흑백)</span>
+              <span className="text-stone-500">
+                <b className="text-stone-700">발견</b> · 대화를 나눈 장소 (흑백)
+              </span>
             </li>
             <li className="flex items-center gap-2">
               <span>🎨</span>
-              <span className="text-stone-500"><b className="text-stone-700">방문</b> · 실제로 방문 인증한 장소 (컬러)</span>
+              <span className="text-stone-500">
+                <b className="text-stone-700">방문</b> · 실제로 방문 인증한 장소
+                (컬러)
+              </span>
             </li>
           </ul>
         </div>
