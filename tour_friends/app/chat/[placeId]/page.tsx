@@ -17,6 +17,52 @@ import VisitButton from '@/components/VisitButton';
 
 const characters = charactersData as CharactersData;
 
+// 마크다운 이미지 + 일반 URL 둘 다 처리
+function renderContent(content: string) {
+  const plainUrlRegex = /(?:^|\s|-)[ \t]*(https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp))/gm;
+  const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g;
+
+  // 일반 URL을 마크다운 이미지 형식으로 통일
+  let normalized = content.replace(
+    plainUrlRegex,
+    (_, url) => `\n![이미지](${url.trim()})`
+  );
+
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+
+  markdownImageRegex.lastIndex = 0;
+  while ((match = markdownImageRegex.exec(normalized)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(
+        <span key={lastIndex} className="whitespace-pre-wrap">
+          {normalized.slice(lastIndex, match.index)}
+        </span>
+      );
+    }
+    parts.push(
+      <img
+        key={match.index}
+        src={match[2]}
+        alt={match[1]}
+        className="w-full rounded-xl mt-2 mb-1"
+      />
+    );
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < normalized.length) {
+    parts.push(
+      <span key={lastIndex} className="whitespace-pre-wrap">
+        {normalized.slice(lastIndex)}
+      </span>
+    );
+  }
+
+  return parts.length > 0 ? parts : content;
+}
+
 // AI 답변에서 친구 이름 언급 감지
 function detectMentionedFriends(text: string, currentPlaceId: string): string[] {
   const character = characters[currentPlaceId];
@@ -25,7 +71,7 @@ function detectMentionedFriends(text: string, currentPlaceId: string): string[] 
   const mentioned = new Set<string>();
   for (const f of character.friends) {
     const friendChar = characters[f.placeId];
-    if (!friendChar) continue; // characters.json에 없는 친구는 스킵
+    if (!friendChar) continue;
     const names = [friendChar.name, friendChar.shortName].filter(
       Boolean
     ) as string[];
@@ -51,11 +97,11 @@ export default function ChatPage() {
   const [isVisited, setIsVisited] = useState(false);
 
   useEffect(() => {
-  setMessages(getChatHistory(placeId));
-  const status = getCollectionStatus(placeId);
-  setIsVisited(status.level === 'visited');
-  setHydrated(true);
-}, [placeId]);
+    setMessages(getChatHistory(placeId));
+    const status = getCollectionStatus(placeId);
+    setIsVisited(status.level === 'visited');
+    setHydrated(true);
+  }, [placeId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -63,7 +109,6 @@ export default function ChatPage() {
       behavior: 'smooth',
     });
   }, [messages, loading]);
-  
 
   async function handleSend() {
     if (!input.trim() || loading) return;
@@ -109,7 +154,6 @@ export default function ChatPage() {
     }
   }
 
-  // 캐릭터 데이터 없음
   if (!character) {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
@@ -144,7 +188,6 @@ export default function ChatPage() {
           </div>
         </div>
         <div className="flex items-center gap-1.5">
-          {/* 방명록 버튼 - 방문 인증한 경우만 활성화 */}
           <button
             onClick={() => {
               setGuestbookMode('list');
@@ -197,13 +240,13 @@ export default function ChatPage() {
                 }`}
               >
                 <div
-                  className={`max-w-[80%] px-4 py-2.5 whitespace-pre-wrap leading-relaxed text-[15px] ${
+                  className={`max-w-[80%] px-4 py-2.5 leading-relaxed text-[15px] ${
                     m.role === 'user'
                       ? 'bg-stone-900 text-white rounded-2xl rounded-br-md'
                       : 'bg-white text-stone-900 border border-stone-200 rounded-2xl rounded-bl-md shadow-sm'
                   }`}
                 >
-                  {m.content}
+                  {renderContent(m.content)}
                 </div>
               </div>
 
