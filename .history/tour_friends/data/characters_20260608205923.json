@@ -1,0 +1,120 @@
+{
+  "126508": {
+    "placeId": "126508",
+    "name": "경복궁",
+    "shortName": "경복궁",
+    "region": "서울 종로구",
+    "emoji": "🏯",
+    "thumbnail": "/characters/gyeongbokgung.png",
+    "mbti": "INFJ",
+    "age": "630살",
+    "tagline": "조선의 첫 정궁. 새벽에 만나면 진짜 모습을 보여주는 차분한 어른.",
+    "latitude": 37.579617,
+    "longitude": 126.977041,
+    "friends": [
+      { "placeId": "127451", "relation": "가장 친한 친구" },
+      { "placeId": "127454", "relation": "가까운 이웃" },
+      { "placeId": "264338", "relation": "선의의 라이벌" }
+    ]
+  },
+  "127454": {
+    "placeId": "127454",
+    "name": "운현궁",
+    "shortName": "운현궁",
+    "region": "서울 종로구",
+    "emoji": "🏠",
+    "thumbnail": "/characters/unhyeongung.png",
+    "mbti": "INFP",
+    "age": "160살",
+    "tagline": "경복궁 옆에서 조용히 살아가는 내성적인 작은 궁.",
+    "latitude": 37.576438,
+    "longitude": 126.987759,
+    "friends": [
+      { "placeId": "126508", "relation": "친한 형" },
+      { "placeId": "264352", "relation": "속마음 친구" }
+    ]
+  },
+  "126509": {
+  "placeId": "126509",
+  "name": "덕수궁",
+  "shortName": "덕수궁",
+  "region": "서울 중구",
+  "emoji": "🍂",
+  "thumbnail": "/characters/deoksugung.png",
+  "mbti": "ISFP",
+  "age": "433살",
+  "tagline": "대한제국의 마지막 정궁. 동서양이 만나고, 슬픔이 머무는 곳.",
+  "latitude": 37.565794,
+  "longitude": 126.975143,
+  "friends": [
+    { "placeId": "126508", "relation": "선의의 라이벌" },
+    { "placeId": "127454", "relation": "추억을 함께 나누는 사이" }
+  ]
+  },
+  "129176": {
+  "placeId": "129176",
+  "name": "묵호등대",
+  "shortName": "묵호등대",
+  "region": "강원 동해시",
+  "emoji": "🏮",
+  "thumbnail": "/characters/mukho.png",
+  "mbti": "ISTP",
+  "age": "63살",
+  "tagline": "묵호항을 60년째 지켜온 등대. 짠내 나는 바닷가 어르신.",
+  "latitude": 37.547076,
+  "longitude": 129.116631,
+  "friends": [
+    { "placeId": "2557057", "relation": "가까운 동해 바다 친구" },
+    { "placeId": "1888644", "relation": "멀리 사는 같은 바다 친구" }
+  ]
+  },
+  "125702": {
+  "placeId": "125702",
+  "name": "양양 낙산해수욕장",
+  "shortName": "낙산해수욕장",
+  "region": "강원 양양군",
+  "emoji": "🏄",
+  "thumbnail": "/characters/naksan.png",
+  "mbti": "ESFP",
+  "age": "50살",
+  "tagline": "한국 서핑 성지. MZ가 사랑하는 동해 바다의 핫플.",
+  "latitude": 38.116200,
+  "longitude": 128.635200,
+  "friends": [
+    { "placeId": "129176", "relation": "옆 동네 바다 어르신" },
+    { "placeId": "2557057", "relation": "같은 동해 친구" }
+  ]
+},
+"1622663": {
+  "placeId": "1622663",
+  "name": "합천 황매산 군립공원",
+  "shortName": "황매산",
+  "region": "경남 합천군",
+  "emoji": "🌺",
+  "thumbnail": "/characters/hwangmaesan.png",
+  "mbti": "ENFP",
+  "age": "나이 불명",
+  "tagline": "봄엔 철쭉, 가을엔 억새. 계절마다 완전 다른 사람인데, 왜 아무도 모르죠?",
+  "latitude": 35.464500,
+  "longitude": 127.975600,
+  "friends": [
+    { "placeId": "1888644", "relation": "숨은 명소 동지" }
+  ]
+},
+"779594": {
+  "placeId": "779594",
+  "name": "한반도지형",
+  "shortName": "한반도지형",
+  "region": "강원 영월군",
+  "emoji": "🗺️",
+  "thumbnail": "/characters/hanbando.png",
+  "mbti": "ISFJ",
+  "age": "나이 불명",
+  "tagline": "강물이 한반도 모양으로 흘러요. 저도 몰랐어요, 위에서 보기 전까진.",
+  "latitude": 37.208300,
+  "longitude": 128.688900,
+  "friends": [
+    { "placeId": "129176", "relation": "같은 강원 친구" }
+  ]
+}
+}

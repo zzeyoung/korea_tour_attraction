@@ -235,22 +235,5 @@
     { "placeId": "125702", "relation": "서핑 라이벌" },
     { "placeId": "129176", "relation": "동해 바다 선배" }
   ]
-},
-"126019": {
-  "placeId": "126019",
-  "name": "팔공산",
-  "shortName": "팔공산",
-  "region": "대구 동구",
-  "emoji": "🙏",
-  "thumbnail": "/characters/palgongsan.png",
-  "mbti": "ISFJ",
-  "age": "나이 불명",
-  "tagline": "갓바위에 소원 빌면 하나는 들어준다고 해요. 매년 수십만 명이 오거든요.",
-  "latitude": 35.987500,
-  "longitude": 128.695300,
-  "friends": [
-    { "placeId": "126166", "relation": "불교 친구" },
-    { "placeId": "1622663", "relation": "같은 경상도 산 친구" }
-  ]
 }
 }
