@@ -17,19 +17,17 @@ import VisitButton from '@/components/VisitButton';
 
 const characters = charactersData as CharactersData;
 
-// 마크다운 이미지 + 링크 형식 + 일반 URL 모두 처리
+// 마크다운 이미지 + 일반 URL 둘 다 처리
 function renderContent(content: string) {
-  // 마크다운 링크 [텍스트](이미지url) → ![텍스트](이미지url) 변환
-  let normalized = content
-    .replace(
-      /\[([^\]]*)\]\((https?:\/\/[^\)]+\.(?:jpg|jpeg|png|gif|webp)[^\)]*)\)/gi,
-      '![$1]($2)'
-    )
-    .replace(
-      /(?:^|\s|-|\.)\s*(https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp)\S*)/gim,
-      '\n![이미지]($1)'
-    );
+  const plainUrlRegex = /(?:^|\s|-)[ \t]*(https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp))/gm;
+  const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g;
 
+  let normalized = content.replace(
+    plainUrlRegex,
+    (_, url) => `\n![이미지](${url.trim()})`
+  );
+
+  // 텍스트 → 줄바꿈 + 볼드(**텍스트**) 처리
   const renderText = (text: string, baseKey: number | string) => {
     return text.split('\n').map((line, j, arr) => {
       const boldParts: React.ReactNode[] = [];
@@ -37,11 +35,18 @@ function renderContent(content: string) {
       let lastIdx = 0;
       let m;
       while ((m = boldRegex.exec(line)) !== null) {
-        if (m.index > lastIdx) boldParts.push(line.slice(lastIdx, m.index));
-        boldParts.push(<strong key={`${baseKey}-${j}-${m.index}`}>{m[1]}</strong>);
+        if (m.index > lastIdx) {
+          boldParts.push(line.slice(lastIdx, m.index));
+        }
+        boldParts.push(
+          <strong key={`${baseKey}-${j}-${m.index}`}>{m[1]}</strong>
+        );
         lastIdx = m.index + m[0].length;
       }
-      if (lastIdx < line.length) boldParts.push(line.slice(lastIdx));
+      if (lastIdx < line.length) {
+        boldParts.push(line.slice(lastIdx));
+      }
+
       return (
         <span key={j}>
           {boldParts.length > 0 ? boldParts : line}
@@ -51,7 +56,6 @@ function renderContent(content: string) {
     });
   };
 
-  const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g;
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let match;
@@ -84,7 +88,9 @@ function renderContent(content: string) {
     );
   }
 
-  return parts.length > 0 ? parts : <span>{renderText(content, 0)}</span>;
+  if (parts.length > 0) return parts;
+
+  return <span>{renderText(content, 0)}</span>;
 }
 
 // AI 답변에서 친구 이름 언급 감지
@@ -148,63 +154,64 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ placeId, messages: newMessages }),
-      });
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ placeId, messages: newMessages }),
+  });
 
-      if (!res.ok) throw new Error('API error');
+  if (!res.ok) throw new Error('API error');
 
-      const reader = res.body!.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '';
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let fullText = '';
 
-      const streamingMessage: ChatMessage = {
-        role: 'assistant',
-        content: '',
-        timestamp: Date.now(),
-      };
-      setLoading(false);
-      setMessages([...newMessages, streamingMessage]);
+  // 스트리밍 메시지 먼저 추가 (빈 내용으로)
+  const streamingMessage: ChatMessage = {
+    role: 'assistant',
+    content: '',
+    timestamp: Date.now(),
+  };
+  setLoading(false); // 로딩 점점이 끄고
+setMessages([...newMessages, streamingMessage]); // 스트리밍 메시지 시작
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n').filter((l) => l.startsWith('data: '));
+    const chunk = decoder.decode(value);
+    const lines = chunk.split('\n').filter((l) => l.startsWith('data: '));
 
-        for (const line of lines) {
-          const raw = line.slice(6);
-          if (raw === '[DONE]') break;
-          try {
-            const { text } = JSON.parse(raw);
-            fullText += text;
-            setMessages((prev) => {
-              const updated = [...prev];
-              updated[updated.length - 1] = {
-                ...updated[updated.length - 1],
-                content: fullText,
-              };
-              return updated;
-            });
-          } catch {}
-        }
-      }
+    for (const line of lines) {
+      const raw = line.slice(6);
+      if (raw === '[DONE]') break;
+      try {
+        const { text } = JSON.parse(raw);
+        fullText += text;
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            ...updated[updated.length - 1],
+            content: fullText,
+          };
+          return updated;
+        });
+      } catch {}
+    }
+  }
 
-      const recommendedFriends = detectMentionedFriends(fullText, placeId);
-      const finalMessage: ChatMessage = {
-        role: 'assistant',
-        content: fullText,
-        timestamp: Date.now(),
-        recommendedFriends: recommendedFriends.length ? recommendedFriends : undefined,
-      };
-      const finalMessages = [...newMessages, finalMessage];
-      setMessages(finalMessages);
-      saveChatHistory(placeId, finalMessages);
-      markAsDiscovered(placeId);
-    } catch (err) {
+  const recommendedFriends = detectMentionedFriends(fullText, placeId);
+  const finalMessage: ChatMessage = {
+    role: 'assistant',
+    content: fullText,
+    timestamp: Date.now(),
+    recommendedFriends: recommendedFriends.length ? recommendedFriends : undefined,
+  };
+  const finalMessages = [...newMessages, finalMessage];
+  setMessages(finalMessages);
+  saveChatHistory(placeId, finalMessages);
+  markAsDiscovered(placeId);
+}catch (err) {
       console.error(err);
       alert('대화 실패: ' + (err instanceof Error ? err.message : err));
     } finally {
