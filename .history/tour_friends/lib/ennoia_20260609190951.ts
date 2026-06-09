@@ -9,6 +9,36 @@ interface EnnoiaRequestBody {
   }[];
 }
 
+// 다양한 응답 형식에서 텍스트 추출 (Sonnet, Haiku 등)
+function extractText(data: any): string | null {
+  // 1. content가 배열인 경우 (Haiku 형식): [{type: 'text', text: '...'}]
+  const contentArr = data?.choices?.[0]?.message?.content;
+  if (Array.isArray(contentArr)) {
+    const textParts = contentArr
+      .filter((c: any) => c?.type === 'text' && typeof c?.text === 'string')
+      .map((c: any) => c.text);
+    if (textParts.length > 0) return textParts.join('\n');
+  }
+
+  // 2. content가 객체인 경우 (Sonnet 형식): {type: 'text', text: '...'}
+  if (contentArr?.type === 'text' && typeof contentArr?.text === 'string') {
+    return contentArr.text;
+  }
+
+  // 3. 일반 OpenAI 호환 형식
+  const reply =
+    data?.choices?.[0]?.message?.content ??
+    data?.message?.content ??
+    data?.content ??
+    data?.reply ??
+    data?.result?.content ??
+    data?.data?.content;
+
+  if (typeof reply === 'string') return reply;
+
+  return null;
+}
+
 async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
   const url = process.env.ENNOIA_API_URL!;
   const project = process.env.ENNOIA_PROJECT!;
@@ -22,7 +52,6 @@ async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
       role: m.role,
       content: [{ type: 'text' as const, text: m.content }],
     })),
-    
   };
 
   const res = await fetch(url, {
@@ -45,18 +74,15 @@ async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
   const data = await res.json();
   console.log('[ennoia] raw response:', JSON.stringify(data, null, 2));
 
-  const reply =
-    data?.choices?.[0]?.message?.content?.[0]?.text ??
-    data?.choices?.[0]?.message?.content ??
-    data?.message?.content ??
-    data?.content ??
-    data?.reply ??
-    data?.result?.content ??
-    data?.data?.content;
+  let reply = extractText(data);
 
-  if (!reply || typeof reply !== 'string') {
+  if (!reply) {
+    console.error('[ennoia] 응답에서 텍스트 못 찾음');
     throw new Error('Cannot parse Ennoia response');
   }
+
+  // escape된 \n을 실제 줄바꿈으로 변환
+  reply = reply.replace(/\\n/g, '\n');
 
   return reply;
 }

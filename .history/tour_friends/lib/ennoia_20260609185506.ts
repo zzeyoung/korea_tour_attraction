@@ -22,7 +22,6 @@ async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
       role: m.role,
       content: [{ type: 'text' as const, text: m.content }],
     })),
-    
   };
 
   const res = await fetch(url, {
@@ -58,7 +57,8 @@ async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
     throw new Error('Cannot parse Ennoia response');
   }
 
-  return reply;
+  const normalizedReply = reply.replace(/\\n/g, '\n');
+return normalizedReply;
 }
 
 // 스트리밍: 응답 받은 후 청크로 나눠서 흘려보냄

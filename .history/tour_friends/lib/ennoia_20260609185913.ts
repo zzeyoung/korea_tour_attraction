@@ -7,6 +7,7 @@ interface EnnoiaRequestBody {
     role: 'user' | 'assistant';
     content: { type: 'text'; text: string }[];
   }[];
+  stream?: boolean;  // ⭐ 추가
 }
 
 async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
@@ -22,7 +23,7 @@ async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
       role: m.role,
       content: [{ type: 'text' as const, text: m.content }],
     })),
-    
+    stream: true,  // ⭐ 추가
   };
 
   const res = await fetch(url, {
@@ -61,7 +62,6 @@ async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
   return reply;
 }
 
-// 스트리밍: 응답 받은 후 청크로 나눠서 흘려보냄
 export async function sendToEnnoiaStream(
   personaCard: string,
   messages: ChatMessage[]
@@ -90,7 +90,6 @@ export async function sendToEnnoiaStream(
   });
 }
 
-// 기존 함수 유지
 export async function sendToEnnoia(
   personaCard: string,
   messages: ChatMessage[]

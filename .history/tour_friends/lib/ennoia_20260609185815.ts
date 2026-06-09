@@ -22,7 +22,7 @@ async function callEnnoia(personaCard: string, messages: ChatMessage[]) {
       role: m.role,
       content: [{ type: 'text' as const, text: m.content }],
     })),
-    
+    stream: true,
   };
 
   const res = await fetch(url, {

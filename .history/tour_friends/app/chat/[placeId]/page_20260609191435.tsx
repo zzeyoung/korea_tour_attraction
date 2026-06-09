@@ -22,14 +22,15 @@ function renderContent(content: string) {
   const plainUrlRegex = /(?:^|\s|-)[ \t]*(https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp))/gm;
   const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g;
 
+  // 일반 URL을 마크다운 이미지 형식으로 통일
   let normalized = content.replace(
     plainUrlRegex,
     (_, url) => `\n![이미지](${url.trim()})`
   );
-
-  // 텍스트 → 줄바꿈 + 볼드(**텍스트**) 처리
-  const renderText = (text: string, baseKey: number | string) => {
+  
+  const renderTextWithFormatting = (text: string, baseKey: number) => {
     return text.split('\n').map((line, j, arr) => {
+      // **볼드** 처리
       const boldParts: React.ReactNode[] = [];
       const boldRegex = /\*\*([^*]+)\*\*/g;
       let lastIdx = 0;
@@ -38,9 +39,7 @@ function renderContent(content: string) {
         if (m.index > lastIdx) {
           boldParts.push(line.slice(lastIdx, m.index));
         }
-        boldParts.push(
-          <strong key={`${baseKey}-${j}-${m.index}`}>{m[1]}</strong>
-        );
+        boldParts.push(<strong key={`${baseKey}-${j}-${m.index}`}>{m[1]}</strong>);
         lastIdx = m.index + m[0].length;
       }
       if (lastIdx < line.length) {
@@ -55,7 +54,7 @@ function renderContent(content: string) {
       );
     });
   };
-
+  
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let match;
@@ -63,11 +62,13 @@ function renderContent(content: string) {
   markdownImageRegex.lastIndex = 0;
   while ((match = markdownImageRegex.exec(normalized)) !== null) {
     if (match.index > lastIndex) {
-      parts.push(
-        <span key={lastIndex}>
-          {renderText(normalized.slice(lastIndex, match.index), lastIndex)}
-        </span>
-      );
+     parts.push(
+  <span key={lastIndex}>
+    {normalized.slice(lastIndex, match.index).split('\n').map((line, j, arr) => (
+      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
+    ))}
+  </span>
+);
     }
     parts.push(
       <img
@@ -82,15 +83,23 @@ function renderContent(content: string) {
 
   if (lastIndex < normalized.length) {
     parts.push(
-      <span key={lastIndex}>
-        {renderText(normalized.slice(lastIndex), lastIndex)}
-      </span>
-    );
+  <span key={lastIndex}>
+    {normalized.slice(lastIndex).split('\n').map((line, j, arr) => (
+      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
+    ))}
+  </span>
+);
   }
 
   if (parts.length > 0) return parts;
 
-  return <span>{renderText(content, 0)}</span>;
+return (
+  <span>
+    {content.split('\n').map((line, j, arr) => (
+      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
+    ))}
+  </span>
+);
 }
 
 // AI 답변에서 친구 이름 언급 감지
