@@ -35,13 +35,11 @@ function renderContent(content: string) {
   markdownImageRegex.lastIndex = 0;
   while ((match = markdownImageRegex.exec(normalized)) !== null) {
     if (match.index > lastIndex) {
-     parts.push(
-  <span key={lastIndex}>
-    {normalized.slice(lastIndex, match.index).split('\n').map((line, j, arr) => (
-      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
-    ))}
-  </span>
-);
+      parts.push(
+        <span key={lastIndex} className="whitespace-pre-wrap">
+          {normalized.slice(lastIndex, match.index)}
+        </span>
+      );
     }
     parts.push(
       <img
@@ -56,23 +54,13 @@ function renderContent(content: string) {
 
   if (lastIndex < normalized.length) {
     parts.push(
-  <span key={lastIndex}>
-    {normalized.slice(lastIndex).split('\n').map((line, j, arr) => (
-      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
-    ))}
-  </span>
-);
+      <span key={lastIndex} className="whitespace-pre-wrap">
+        {normalized.slice(lastIndex)}
+      </span>
+    );
   }
 
-  if (parts.length > 0) return parts;
-
-return (
-  <span>
-    {content.split('\n').map((line, j, arr) => (
-      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
-    ))}
-  </span>
-);
+  return parts.length > 0 ? parts : content;
 }
 
 // AI 답변에서 친구 이름 언급 감지
@@ -136,64 +124,29 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-  const res = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ placeId, messages: newMessages }),
-  });
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ placeId, messages: newMessages }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'API error');
 
-  if (!res.ok) throw new Error('API error');
+      const recommendedFriends = detectMentionedFriends(data.reply, placeId);
 
-  const reader = res.body!.getReader();
-  const decoder = new TextDecoder();
-  let fullText = '';
-
-  // 스트리밍 메시지 먼저 추가 (빈 내용으로)
-  const streamingMessage: ChatMessage = {
-    role: 'assistant',
-    content: '',
-    timestamp: Date.now(),
-  };
-  setLoading(false); // 로딩 점점이 끄고
-setMessages([...newMessages, streamingMessage]); // 스트리밍 메시지 시작
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    const chunk = decoder.decode(value);
-    const lines = chunk.split('\n').filter((l) => l.startsWith('data: '));
-
-    for (const line of lines) {
-      const raw = line.slice(6);
-      if (raw === '[DONE]') break;
-      try {
-        const { text } = JSON.parse(raw);
-        fullText += text;
-        setMessages((prev) => {
-          const updated = [...prev];
-          updated[updated.length - 1] = {
-            ...updated[updated.length - 1],
-            content: fullText,
-          };
-          return updated;
-        });
-      } catch {}
-    }
-  }
-
-  const recommendedFriends = detectMentionedFriends(fullText, placeId);
-  const finalMessage: ChatMessage = {
-    role: 'assistant',
-    content: fullText,
-    timestamp: Date.now(),
-    recommendedFriends: recommendedFriends.length ? recommendedFriends : undefined,
-  };
-  const finalMessages = [...newMessages, finalMessage];
-  setMessages(finalMessages);
-  saveChatHistory(placeId, finalMessages);
-  markAsDiscovered(placeId);
-}catch (err) {
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.reply,
+        timestamp: Date.now(),
+        recommendedFriends: recommendedFriends.length
+          ? recommendedFriends
+          : undefined,
+      };
+      const finalMessages = [...newMessages, assistantMessage];
+      setMessages(finalMessages);
+      saveChatHistory(placeId, finalMessages);
+      markAsDiscovered(placeId);
+    } catch (err) {
       console.error(err);
       alert('대화 실패: ' + (err instanceof Error ? err.message : err));
     } finally {

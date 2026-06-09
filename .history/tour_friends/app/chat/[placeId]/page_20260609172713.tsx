@@ -56,23 +56,13 @@ function renderContent(content: string) {
 
   if (lastIndex < normalized.length) {
     parts.push(
-  <span key={lastIndex}>
-    {normalized.slice(lastIndex).split('\n').map((line, j, arr) => (
-      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
-    ))}
-  </span>
-);
+      <span key={lastIndex} className="whitespace-pre-wrap">
+        {normalized.slice(lastIndex)}
+      </span>
+    );
   }
 
-  if (parts.length > 0) return parts;
-
-return (
-  <span>
-    {content.split('\n').map((line, j, arr) => (
-      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
-    ))}
-  </span>
-);
+  return parts.length > 0 ? parts : content;
 }
 
 // AI 답변에서 친구 이름 언급 감지
@@ -154,8 +144,7 @@ export default function ChatPage() {
     content: '',
     timestamp: Date.now(),
   };
-  setLoading(false); // 로딩 점점이 끄고
-setMessages([...newMessages, streamingMessage]); // 스트리밍 메시지 시작
+  setMessages([...newMessages, streamingMessage]);
 
   while (true) {
     const { done, value } = await reader.read();

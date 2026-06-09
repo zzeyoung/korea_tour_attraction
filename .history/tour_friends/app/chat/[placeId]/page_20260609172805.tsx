@@ -64,15 +64,7 @@ function renderContent(content: string) {
 );
   }
 
-  if (parts.length > 0) return parts;
-
-return (
-  <span>
-    {content.split('\n').map((line, j, arr) => (
-      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
-    ))}
-  </span>
-);
+  return parts.length > 0 ? parts : content;
 }
 
 // AI 답변에서 친구 이름 언급 감지

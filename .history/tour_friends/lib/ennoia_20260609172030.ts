@@ -70,7 +70,7 @@ export async function sendToEnnoiaStream(
 
   return new ReadableStream({
     start(controller) {
-      const chunks = reply.match(/[\s\S]{1,12}/g) || [];
+      const chunks = reply.match(/.{1,6}/g) || [];
       let i = 0;
       function push() {
         if (i >= chunks.length) {
