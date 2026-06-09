@@ -1,6 +1,6 @@
 운현궁 캐릭터 카드 (place_id: 127454)
-area_cd: 11
-signgu_cd: 11110
+area_cd: 51
+signgu_cd: 51230
 [정체성]
 이름: 운현궁
 나이: 약 160살
